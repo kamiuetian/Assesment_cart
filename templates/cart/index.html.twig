@@ -1,0 +1,175 @@
+{% extends 'base.html.twig' %}
+{% block stylesheets %}<link rel="stylesheet" href="{{ asset('build/custom.css') }}">{% endblock %}
+{% block body %}
+<div class="container mb-4">
+    <div class="row">
+	<div class="col-md-6 offset-3">
+				<!-- Form data start -->
+				<form action="" method="POST" class="form-inline" role="form">
+					<div class="form-group">
+						<input type="text" placeholder="Search Product" class="form-control search_query" id="search_query" data-id="">
+						</div>
+				</form>
+				<div id="data-container"></div>
+				<!-- Form data end -->
+				<div class="selected_data_containter" id="selected_data_containter">
+					
+				</div>
+			</div>
+		</div>
+		
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col"> </th>
+                            <th scope="col">Product</th>
+                            <th scope="col" class="text-center">Quantity</th>
+                            <th scope="col" class="text-right">Price</th>
+                            <th> </th>
+                        </tr>
+                    </thead>
+                    <tbody id="cart-products">
+{% for product in products %}
+    {{ include('/inc/products.html.twig') }}
+{% endfor %}
+
+	`
+                        
+                    </tbody>
+					<tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td><strong>Total</strong></td>
+                            <td class="text-right" id="total"><strong>{{totalPrice}} €</strong></td>
+                        </tr>
+                </table>
+            </div>
+        </div>
+        <div class="col mb-2">
+            <div class="row">
+              <!--<button class="btn btn-block btn-light">Continue Shopping</button>-->
+                </div>
+                <div class="col-sm-12 col-md-6 text-right">
+                    <button class="btn btn-lg btn-block btn-success text-uppercase">Checkout</button>
+                </div>
+            </div>
+        </div>
+         </div>
+</div>
+{% endblock %}
+{% block javascripts %}
+<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+<script>
+/*Autocomplete search*/
+$('#search_query').keyup(function() {
+	var search_query = $(this).val();
+	var form_data = {
+		search_query : search_query
+	}
+	var resp_data_format="";
+	
+	$.ajax({
+		url:"/Assesment_cart/public/complete",
+		data : form_data,
+		method : "post",
+		dataType : "json",
+		success : function(response) {
+			for (var i = 0; i < response.length; i++) {
+				resp_data_format=resp_data_format+"<li class='select_product' data-id='"+response[i].id+"'>"+response[i].product_name+"</li>";
+			};
+			$("#data-container").html(resp_data_format);
+		}
+	});
+});
+/*Add product to cart once selected from autocomplete*/
+$(document).on( "click", ".select_product", function(){
+	var products_data="";
+	var selected_product = $(this).html();
+	var selected_id=$(this).attr('data-id');
+	$('#search_query').val(selected_product);
+	$('#search_query').attr('data-id',selected_id);
+	$('#data-container').html('');
+	$.ajax({
+		url:"/Assesment_cart/public/add-to-cart",
+		data : {'id':selected_id, 'productname':selected_product, 'productquantity':1},
+		method : "post",
+		dataType : "json",
+		success : function(response) {			
+			for (var i = 0; i < response['products'].length; i++) {
+				
+				products_data=products_data+"<tr class='cart-product' data-id='"+response['products'][i].productId+"'>"+
+    "<td><img src='https://dummyimage.com/50x50/55595c/fff' /> </td>"+
+         "<td>"+response['products'][i].id+"</td><td></td>"+
+            "<td><input class='form-control quantity' type='number' value='"+response['products'][i].quantity+"' min='1' /></td>"+
+             "<td class='text-right'>"+response['products'][i].productPrice+"€</td>"+
+              "<td class='text-right'><button class='btn btn-sm btn-danger delete_product' data-id='1'><i class='fa fa-trash'></i> </button> </td></tr>";
+				};
+				$("#cart-products").html();
+			$("#cart-products").html(products_data);
+			$("#total").html(response['total']);
+		}
+	});
+});
+/*Delete product on delete button event*/
+
+$(document).on( "click", ".delete_product", function(){
+	var products_data="";
+	var selected_id=$(this).attr('data-id');
+	
+	$.ajax({
+		url:"/Assesment_cart/public/delete-cart-item",
+		data : {'id':selected_id},
+		method : "post",
+		dataType : "json",
+		success : function(response) {
+			for (var i = 0; i < response['products'].length; i++) {
+			
+				products_data=products_data+"<tr class='cart-product' data-id='"+response['products'][i].productId+"'>"+
+    "<td><img src='https://dummyimage.com/50x50/55595c/fff' /> </td>"+
+         "<td>"+response['products'][i].id+"</td><td></td>"+
+            "<td><input class='form-control quantity' type='number' value='"+response['products'][i].quantity+"' min='1' /></td>"+
+             "<td class='text-right'>"+response['products'][i].productPrice+"€</td>"+
+              "<td class='text-right'><button class='btn btn-sm btn-danger delete_product' data-id='1'><i class='fa fa-trash'></i> </button> </td></tr>";
+				};
+				$("#cart-products").html();
+			$("#cart-products").html(products_data);
+			$("#total").html(response['total']);
+		}
+	});
+});
+/*update quantity*/
+$(document).on( "change", ".quantity", function(){
+	var products_data="";
+	var selected_id=$(this).closest('tr').attr('data-id');
+	var quantity=$(this).val();
+	$.ajax({
+		url:"/Assesment_cart/public/update-cart-item",
+		data : {'id':selected_id,'quantity':quantity},
+		method : "post",
+		dataType : "json",
+		success : function(response) {
+			for (var i = 0; i < response['products'].length; i++) {
+				products_data=products_data+"<tr class='cart-product' data-id='"+response['products'][i].productId+"'>"+
+    "<td><img src='https://dummyimage.com/50x50/55595c/fff' /> </td>"+
+         "<td>"+response['products'][i].id+"</td><td></td>"+
+            "<td><input class='form-control quantity' type='number' value='"+response['products'][i].quantity+"' min='1' /></td>"+
+             "<td class='text-right'>"+response['products'][i].productPrice+"€</td>"+
+              "<td class='text-right'><button class='btn btn-sm btn-danger delete_product' data-id='1'><i class='fa fa-trash'></i> </button> </td></tr>";
+				};
+				$("#cart-products").html();
+			$("#cart-products").html(products_data);
+			$("#total").html(response['total']);
+		}
+	});
+});
+
+function selectproduct(val) {
+$("#search-box").val(val);
+$("#suggesstion-box").hide();
+}
+
+</script>
+{% endblock %}
