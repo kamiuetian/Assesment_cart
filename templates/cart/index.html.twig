@@ -78,7 +78,7 @@ $('#search_query').keyup(function() {
 		dataType : "json",
 		success : function(response) {
 			for (var i = 0; i < response.length; i++) {
-				resp_data_format=resp_data_format+"<li class='select_product' data-id='"+response[i].id+"'>"+response[i].product_name+"</li>";
+				resp_data_format=resp_data_format+"<li class='select_product' data-price='"+response[i].product_price+"' data-id='"+response[i].id+"'>"+response[i].product_name+"</li>";
 			};
 			$("#data-container").html(resp_data_format);
 		}
@@ -89,20 +89,21 @@ $(document).on( "click", ".select_product", function(){
 	var products_data="";
 	var selected_product = $(this).html();
 	var selected_id=$(this).attr('data-id');
+	var selected_price=$(this).attr('data-price');
 	$('#search_query').val(selected_product);
 	$('#search_query').attr('data-id',selected_id);
 	$('#data-container').html('');
 	$.ajax({
 		url:"/Assesment_cart/public/add-to-cart",
-		data : {'id':selected_id, 'productname':selected_product, 'productquantity':1},
+		data : {'id':selected_id, 'productname':selected_product, 'productquantity':1, 'price':selected_price},
 		method : "post",
 		dataType : "json",
 		success : function(response) {			
 			for (var i = 0; i < response['products'].length; i++) {
 				
-				products_data=products_data+"<tr class='cart-product' data-id='"+response['products'][i].productId+"'>"+
+				products_data=products_data+"<tr class='cart-product' data-price='"+response['products'][i].productPrice+"' data-id='"+response['products'][i].productId+"'>"+
     "<td><img src='https://dummyimage.com/50x50/55595c/fff' /> </td>"+
-         "<td>"+response['products'][i].id+"</td><td></td>"+
+         "<td>"+response['products'][i].id+"</td>"+
             "<td><input class='form-control quantity' type='number' value='"+response['products'][i].quantity+"' min='1' /></td>"+
              "<td class='text-right'>"+response['products'][i].productPrice+"€</td>"+
               "<td class='text-right'><button class='btn btn-sm btn-danger delete_product' data-id='1'><i class='fa fa-trash'></i> </button> </td></tr>";
@@ -118,6 +119,7 @@ $(document).on( "click", ".select_product", function(){
 $(document).on( "click", ".delete_product", function(){
 	var products_data="";
 	var selected_id=$(this).attr('data-id');
+	var selected_price=$(this).attr('data-price');
 	
 	$.ajax({
 		url:"/Assesment_cart/public/delete-cart-item",
@@ -127,9 +129,9 @@ $(document).on( "click", ".delete_product", function(){
 		success : function(response) {
 			for (var i = 0; i < response['products'].length; i++) {
 			
-				products_data=products_data+"<tr class='cart-product' data-id='"+response['products'][i].productId+"'>"+
+				products_data=products_data+"<tr class='cart-product' data-price='"+response['products'][i].productPrice+"' data-id='"+response['products'][i].productId+"'>"+
     "<td><img src='https://dummyimage.com/50x50/55595c/fff' /> </td>"+
-         "<td>"+response['products'][i].id+"</td><td></td>"+
+         "<td>"+response['products'][i].id+"</td>"+
             "<td><input class='form-control quantity' type='number' value='"+response['products'][i].quantity+"' min='1' /></td>"+
              "<td class='text-right'>"+response['products'][i].productPrice+"€</td>"+
               "<td class='text-right'><button class='btn btn-sm btn-danger delete_product' data-id='1'><i class='fa fa-trash'></i> </button> </td></tr>";
@@ -144,17 +146,19 @@ $(document).on( "click", ".delete_product", function(){
 $(document).on( "change", ".quantity", function(){
 	var products_data="";
 	var selected_id=$(this).closest('tr').attr('data-id');
+	var selected_id=$(this).closest('tr').attr('data-price');
+	var selected_price=$(this).attr('data-price');
 	var quantity=$(this).val();
 	$.ajax({
 		url:"/Assesment_cart/public/update-cart-item",
-		data : {'id':selected_id,'quantity':quantity},
+		data : {'id':selected_id,'quantity':quantity,'price':selected_price},
 		method : "post",
 		dataType : "json",
 		success : function(response) {
 			for (var i = 0; i < response['products'].length; i++) {
-				products_data=products_data+"<tr class='cart-product' data-id='"+response['products'][i].productId+"'>"+
+				products_data=products_data+"<tr class='cart-product' data-price='"+response['products'][i].productPrice+"' data-id='"+response['products'][i].productId+"'>"+
     "<td><img src='https://dummyimage.com/50x50/55595c/fff' /> </td>"+
-         "<td>"+response['products'][i].id+"</td><td></td>"+
+         "<td>"+response['products'][i].id+"</td>"+
             "<td><input class='form-control quantity' type='number' value='"+response['products'][i].quantity+"' min='1' /></td>"+
              "<td class='text-right'>"+response['products'][i].productPrice+"€</td>"+
               "<td class='text-right'><button class='btn btn-sm btn-danger delete_product' data-id='1'><i class='fa fa-trash'></i> </button> </td></tr>";

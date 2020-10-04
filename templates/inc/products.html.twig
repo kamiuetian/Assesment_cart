@@ -1,4 +1,4 @@
- <tr class='cart-product' data-id={{product.getProductId}}>
+ <tr class='cart-product' data-id={{product.getProductId}} data-price={{product.getProductPrice/product.getQuantity()}}>
     <td><img src='https://dummyimage.com/50x50/55595c/fff' /> </td>
                             <td>name</td>
                             <td><input  class='form-control quantity' type='number'  value='{{product.getQuantity()}}' min='1' /></td>

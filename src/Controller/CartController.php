@@ -37,7 +37,7 @@ class CartController extends AbstractController
         $total=0;
         $productId=(int)$request->request->get('id');
         $productName=$request->request->get('productname');
-        $productPrice=10;
+        $productPrice=(int)$request->request->get('price');;
         $productQuantity=1;//$request->request->get('productquantity');
         $entityManager = $this->getDoctrine()->getManager();
         $product = $this->getDoctrine()->getRepository(Cartproducts::class)
@@ -83,7 +83,7 @@ class CartController extends AbstractController
         $total=0;
         $productId=$request->request->get('id');
         $quantity=$request->request->get('quantity');
-        $productprice=10;
+        $productprice=$request->request->get('price');;
         $product = $this->getDoctrine()->getRepository(Cartproducts::class)
         ->findOneBySomeField($productId);
         $entityManager = $this->getDoctrine()->getManager();
