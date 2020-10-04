@@ -13,6 +13,14 @@
 {
     width:300px;
     list-style: none;
+    line-height:30px;
     
+}
+#list-quantity
+{
+    width:30%;
+    height:20px;
+    float:right;
+    margin-left:10px;
 }
 

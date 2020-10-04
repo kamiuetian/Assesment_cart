@@ -77,7 +77,7 @@ $('#search_query').keyup(function() {
 		dataType : "json",
 		success : function(response) {
 			for (var i = 0; i < response.length; i++) {
-				resp_data_format=resp_data_format+"<li class='select_product' data-price='"+response[i].product_price+"' data-id='"+response[i].id+"'>"+response[i].product_name+"<span style='float:right;'>"+response[i].product_price+"€</span></li>";
+				resp_data_format=resp_data_format+"<li class='select_product' data-price='"+response[i].product_price+"' data-id='"+response[i].id+"'>"+response[i].product_name+"<span> ----"+response[i].product_price+"€</span></li>";
 			};
 			$("#data-container").html(resp_data_format);
 		}
@@ -89,7 +89,7 @@ $(document).on( "click", ".select_product", function(){
 	var selected_product = $(this).html();
 	var selected_id=$(this).attr('data-id');
 	var selected_price=$(this).attr('data-price');
-	$('#search_query').val(selected_product);
+	$('#search_query').val('');
 	$('#search_query').attr('data-id',selected_id);
 	$('#data-container').html('');
 	$.ajax({
