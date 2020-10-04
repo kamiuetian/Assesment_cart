@@ -4,7 +4,7 @@
     width:300px;
     
 }
-#data-container
+#data-container, #search_query
 {
     width:300px;
     
@@ -15,3 +15,4 @@
     list-style: none;
     
 }
+
